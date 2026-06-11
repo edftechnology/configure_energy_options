@@ -1,36 +1,38 @@
-# Como configurar/instalar o `Power Manager` no `Linux Ubuntu` pelo `Terminal Emulator`
+# Como instalar/configurar o `Xfce Power Manager` no `Linux Ubuntu` pelo `Terminal Emulator`
 
 ## Resumo
 
-Neste documento estão contidos os principais comandos e configurações para configurar/instalar o `Power Manager` no `Linux Ubuntu`.
+Neste documento estão contidos os principais comandos para instalar, verificar e configurar o `Xfce Power Manager` no `Linux Ubuntu`.
 
 ## _Abstract_
 
-_This document contains the main commands and configurations to configure/install the `Power Manager` on `Linux Ubuntu`._
+_This document contains the main commands to install, verify, and configure `Xfce Power Manager` on `Linux Ubuntu`._
 
-## Descrição [2]
+## Descrição [2][3]
 
-### `Power Manager`
+### `Xfce Power Manager`
 
-O `Power Manager` é uma aplicação ou recurso de _software_ projetado para gerenciar o consumo de 
-energia e as configurações de energia em sistemas computacionais, como _laptops_ e _desktops_. Ele 
-oferece aos usuários a capacidade de personalizar o comportamento do sistema em relação ao 
-gerenciamento de energia, permitindo que ajustem configurações como suspensão, desligamento 
-automático do monitor e economia de energia da CPU. O `Power Manager` é valioso para otimizar o uso 
-de energia, prolongar a vida útil da bateria em dispositivos móveis e reduzir o consumo de energia 
-em sistemas de _desktop_, contribuindo para uma experiência de computação mais eficiente e amigável 
-ao meio ambiente. Geralmente, ele oferece opções para criar perfis de energia personalizados, 
-adaptando-se às necessidades dos usuários em diferentes cenários de uso.
+O `Xfce Power Manager`, fornecido pelo pacote `xfce4-power-manager`, gerencia fontes de energia,
+nível de brilho, suspensão, hibernação, eventos da tampa e economia de energia do monitor. Ele é
+destinado principalmente ao ambiente gráfico Xfce e utiliza componentes como `UPower`, `D-Bus` e
+`systemd-logind` para executar as ações de energia suportadas pelo sistema.
 
-## 1. Como configurar/instalar o `Power Manager`no `Linux Ubuntu` [1][3]
+No Xubuntu e em instalações do Ubuntu que usam o ambiente Xfce, o `Xfce Power Manager` geralmente
+já vem instalado como parte de `xubuntu-core` ou `xubuntu-desktop`. O Ubuntu padrão com GNOME já
+possui gerenciamento de energia integrado às Configurações do sistema, mas não necessariamente
+inclui o pacote `xfce4-power-manager`. As instruções abaixo mostram a instalação completa mesmo
+quando outro gerenciador de energia já está disponível. Evite executar simultaneamente dois
+gerenciadores gráficos de energia, pois eles podem disputar eventos de suspensão, tampa e brilho.
 
-Para configurar/instalar o `Power Manager` no `Linux Ubuntu`, você pode seguir estes passos:
+## 1. Como instalar/configurar o `Xfce Power Manager` no `Linux Ubuntu` [1][2][3][4][5]
+
+Para instalar/configurar o `Xfce Power Manager` no `Linux Ubuntu`, você pode seguir estes passos:
 
 1. Abrir o `Terminal Emulator`. Você pode fazer isso pressionando:
 
     ```bash
     Ctrl + Alt + T
-    ```    
+    ```
 
 2. Certifique-se de que seu sistema esteja limpo e atualizado.
 
@@ -74,85 +76,102 @@ Para configurar/instalar o `Power Manager` no `Linux Ubuntu`, você pode seguir 
     sudo apt full-upgrade -y
     ```
 
-Para alterar a ação do evento `HandleLidSwitch` para `suspend` no `systemd`, você precisará editar o arquivo de configuração do `systemd-logind`. Aqui está como você pode fazer isso:
-
-1. Abrir o arquivo de configuração para edição: Você precisa editar o arquivo `/etc/systemd/logind.conf`. Geralmente, isso requer permissões de administrador, então você usará um editor de texto com `sudo`. Por exemplo, se você preferir usar o `nano` como editor de texto, o comando seria: 
+3. Verificar se o pacote já está instalado. Esse caso é comum no Xubuntu e em sessões Xfce:
 
     ```bash
-    sudo nano /etc/systemd/logind.conf
+    dpkg-query -W -f='${Status}\n' xfce4-power-manager 2>/dev/null | grep -q 'install ok installed' && echo 'O Xfce Power Manager já está instalado.' || echo 'O Xfce Power Manager não está instalado.'
     ```
 
-2. **Modificar a configuração:** Dentro do arquivo `logind.conf`, procure pela linha que contém `HandleLidSwitch`. Se essa linha começar com um `#`, isso significa que ela está comentada (desativada). Você precisará descomentá-la (remover o `#`) e alterar seu valor para `suspend`. Deverá ficar assim:
+4. Instalar o utilitário de gerenciamento de repositórios e habilitar o repositório `universe`, no qual o pacote é distribuído pelo Ubuntu:
 
     ```bash
-    HandleLidSwitch=suspend
+    sudo apt install -y software-properties-common
+    sudo add-apt-repository -y universe
+    sudo apt update
     ```
 
-    Se a linha não existir, você pode simplesmente adicionar essa linha ao final do arquivo:
+5. Instalar o `Xfce Power Manager` e suas dependências:
 
     ```bash
-    #  This file is part of systemd.
-    #
-    #  systemd is free software; you can redistribute it and/or modify it under the
-    #  terms of the GNU Lesser General Public License as published by the Free
-    #  Software Foundation; either version 2.1 of the License, or (at your option)
-    #  any later version.
-    #
-    # Entries in this file show the compile time defaults. Local configuration
-    # should be created by either modifying this file, or by creating "drop-ins" in
-    # the logind.conf.d/ subdirectory. The latter is generally recommended.
-    # Defaults can be restored by simply deleting this file and all drop-ins.
-    #
-    # Use 'systemd-analyze cat-config systemd/logind.conf' to display the full config.
-    #
-    # See logind.conf(5) for details.
-
-    [Login]
-    #NAutoVTs=6
-    #ReserveVT=6
-    #KillUserProcesses=no
-    #KillOnlyUsers=
-    #KillExcludeUsers=root
-    #InhibitDelayMaxSec=5
-    #UserStopDelaySec=10
-    #HandlePowerKey=poweroff
-    #HandleSuspendKey=suspend
-    #HandleHibernateKey=hibernate
-    HandleLidSwitch=suspend
-    #HandleLidSwitchExternalPower=suspend
-    #HandleLidSwitchDocked=suspend
-    #HandleRebootKey=reboot
-    #PowerKeyIgnoreInhibited=no
-    #SuspendKeyIgnoreInhibited=no
-    #HibernateKeyIgnoreInhibited=no
-    #LidSwitchIgnoreInhibited=yes
-    #RebootKeyIgnoreInhibited=no
-    #HoldoffTimeoutSec=30s
-    #IdleAction=ignore
-    #IdleActionSec=30min
-    #RuntimeDirectorySize=10%
-    #RuntimeDirectoryInodesMax=400k
-    #RemoveIPC=yes
-    #InhibitorsMax=8192
-    #SessionsMax=8192
+    sudo apt install -y xfce4-power-manager
     ```
 
-3. **Salvar e fechar o arquivo:** Após fazer a alteração, salve e feche o arquivo. No `nano`, você pode fazer isso pressionando `Ctrl+O` para salvar as mudanças e depois `Ctrl+X` para sair.
-
-4. **Aplicar as mudanças:** Para que as alterações tenham efeito, você precisa reiniciar o `systemd-logind`. Isso pode ser feito com o seguinte comando:
+6. Confirmar a instalação e consultar a versão instalada:
 
     ```bash
-    sudo systemctl restart systemd-logind
+    xfce4-power-manager --version
     ```
 
-    Tenha em mente que reiniciar o systemd-logind pode encerrar a sua sessão atual e todas as aplicações abertas, então salve seu trabalho antes de executar este comando.
+7. Iniciar ou reiniciar o gerenciador na sessão gráfica atual:
 
-Por favor, note que alterar as configurações de gerenciamento de energia pode ter efeitos diferentes dependendo do hardware e do ambiente de _desktop_ que você está usando. Certifique-se de testar o comportamento após fazer essas alterações para garantir que ele atenda às suas expectativas.
+    ```bash
+    xfce4-power-manager --restart
+    ```
+
+    Em uma sessão Xfce, ele também será iniciado automaticamente no próximo login. No GNOME, encerre primeiro o outro gerenciador gráfico de energia ou prefira as configurações nativas do ambiente.
+
+8. Abrir a janela de configurações do `Xfce Power Manager`:
+
+    ```bash
+    xfce4-power-manager -c
+    ```
+
+9. Verificar o arquivo de configuração do `Xfce Power Manager`. Depois da primeira execução, o `xfconfd` normalmente mantém as preferências do usuário em `~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-power-manager.xml` [5]:
+
+    ```bash
+    install -d -m 0700 ~/.config/xfce4/xfconf/xfce-perchannel-xml
+    test ! -f ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-power-manager.xml || cp -- ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-power-manager.xml ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-power-manager.xml.bak
+    sed -n '1,240p' ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-power-manager.xml
+    ```
+
+    A configuração usada neste projeto é:
+
+    ```xml
+    <?xml version="1.0" encoding="UTF-8"?>
+
+    <channel name="xfce4-power-manager" version="1.0">
+      <property name="xfce4-power-manager" type="empty">
+        <property name="power-button-action" type="uint" value="4"/>
+        <property name="lock-screen-suspend-hibernate" type="empty"/>
+        <property name="logind-handle-lid-switch" type="bool" value="true"/>
+        <property name="blank-on-ac" type="empty"/>
+        <property name="blank-on-battery" type="empty"/>
+        <property name="dpms-enabled" type="empty"/>
+        <property name="dpms-on-ac-sleep" type="empty"/>
+        <property name="dpms-on-ac-off" type="empty"/>
+        <property name="dpms-on-battery-sleep" type="empty"/>
+        <property name="dpms-on-battery-off" type="empty"/>
+        <property name="show-panel-label" type="empty"/>
+        <property name="inactivity-sleep-mode-on-ac" type="empty"/>
+        <property name="inactivity-sleep-mode-on-battery" type="empty"/>
+        <property name="show-tray-icon" type="bool" value="false"/>
+        <property name="brightness-switch-restore-on-exit" type="int" value="1"/>
+        <property name="brightness-switch" type="int" value="1"/>
+        <property name="handle-brightness-keys" type="bool" value="false"/>
+        <property name="lid-action-on-battery" type="uint" value="1"/>
+        <property name="lid-action-on-ac" type="uint" value="1"/>
+        <property name="critical-power-action" type="uint" value="1"/>
+        <property name="critical-power-level" type="uint" value="10"/>
+      </property>
+    </channel>
+    ```
+
+    As propriedades-folha com `type="empty"` não registram um valor explícito no XML; o comportamento efetivo depende dos valores padrão da versão instalada. Esse arquivo é gerenciado pelo `xfconfd`; prefira alterar as opções pela janela de configurações ou pelo comando `xfconf-query`. Para substituí-lo manualmente, encerre a sessão Xfce primeiro e mantenha a cópia `.bak`.
+
+10. Opcionalmente, configurar o `systemd-logind` para suspender ao fechar a tampa quando nenhum ambiente gráfico estiver controlando esse evento. Use um arquivo de sobreposição em vez de editar `/etc/systemd/logind.conf` diretamente:
+
+    ```bash
+    sudo install -d -m 0755 /etc/systemd/logind.conf.d
+    printf '[Login]\nHandleLidSwitch=suspend\n' | sudo tee /etc/systemd/logind.conf.d/10-lid-switch.conf > /dev/null
+    systemd-analyze cat-config systemd/logind.conf
+    ```
+
+    Reinicie o computador para aplicar essa configuração. Ambientes gráficos podem assumir o controle do evento da tampa por meio de um bloqueio de inibição; nesse caso, configure a ação diretamente no gerenciador de energia do ambiente.
 
 
 ### 2. Código completo para configurar/instalar/usar
 
-Para configurar/instalar/usar para limpar o `Power Manager` no `Linux Ubuntu` sem precisar digitar linha por linha, você pode seguir estas etapas:
+Para instalar e verificar o `Xfce Power Manager` no `Linux Ubuntu` sem precisar digitar linha por linha, você pode seguir estas etapas:
 
 1. Abrir o `Terminal Emulator`. Você pode fazer isso pressionando:
 
@@ -163,13 +182,24 @@ Para configurar/instalar/usar para limpar o `Power Manager` no `Linux Ubuntu` se
 2. Digite o seguinte comando e pressione `Enter`:
 
     ```bash
-    NÂO há.
+    sudo apt install -y software-properties-common
+    sudo add-apt-repository -y universe
+    sudo apt update
+    sudo apt install -y xfce4-power-manager
+    xfce4-power-manager --version
+    xfce4-power-manager --restart
     ```
 
 
 ## Referências
 
-[1] OPENAI. **Instalar o `power manager` no `linux ubuntu` pelo `terminal emulator`.** Disponível em: <https://chat.openai.com/c/a20133bf-1604-438b-ba06-09a5587540e1> (texto adaptado). ChatGPT. Acessado em: 02/02/2024 18:43.
+[1] OPENAI. **Instalar o `power manager` no `linux ubuntu` pelo `terminal emulator`**. Disponível em: <https://chatgpt.com/g/g-p-6980caf949648191ad6acfcdbe590f9e-instalar/c/a20133bf-1604-438b-ba06-09a5587540e1>. ChatGPT. Acessado em: 11/06/2026.
 
-[2] OPENAI. **Vs code: editor popular.** Disponível em: <https://chat.openai.com/c/b640a25d-f8e3-4922-8a3b-ed74a2657e42> (texto adaptado). ChatGPT. Acessado em: 02/02/2024 18:43.
+[2] XFCE. **Xfce4 power manager**. Disponível em: <https://docs.xfce.org/xfce/xfce4-power-manager/start>. Acessado em: 11/06/2026.
+
+[3] XFCE. **Xfce4 power manager: primeiros passos**. Disponível em: <https://docs.xfce.org/xfce/xfce4-power-manager/getting-started>. Acessado em: 11/06/2026.
+
+[4] UBUNTU. **Logind.conf e logind.conf.d: arquivos de configuração do gerenciador de login**. Disponível em: <https://manpages.ubuntu.com/manpages/noble/man5/logind.conf.5.html>. Acessado em: 11/06/2026.
+
+[5] XFCE. **Xfconf: sistema de armazenamento de configurações**. Disponível em: <https://docs.xfce.org/xfce/xfconf/start>. Acessado em: 11/06/2026.
 
